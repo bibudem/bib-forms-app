@@ -1,0 +1,132 @@
+<div class="responses-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()">← Retour</button>
+        <h1>{{ formTitle }}</h1>
+        <span class="response-count">{{ responses.length }} réponse(s)</span>
+      </div>
+
+      <button 
+        class="btn-export" 
+        (click)="exportToCSV()"
+        [disabled]="loading || responses.length === 0"
+      >
+        📥 Exporter CSV
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Chargement des réponses...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && responses.length === 0" class="empty-state">
+    <div class="empty-icon">📊</div>
+    <h3>Aucune réponse</h3>
+    <p>Aucune réponse n'a encore été soumise pour ce formulaire</p>
+  </div>
+
+  <!-- Responses Table -->
+  <div *ngIf="!loading && responses.length > 0" class="responses-table-container">
+    <table class="responses-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Utilisateur</th>
+          <th *ngIf="!formId">Formulaire</th>
+          <th>Réponses</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let response of responses">
+          <td class="date-cell">
+            {{ formatDate(response.submitted_at) }}
+          </td>
+          <td class="user-cell">
+            {{ response.profiles?.email || 'Anonyme' }}
+          </td>
+          <td *ngIf="!formId" class="form-cell">
+            {{ response.forms?.title || 'N/A' }}
+          </td>
+          <td class="preview-cell">
+            <div class="response-preview">
+              {{ getResponseKeys(response.response_data).length }} question(s) répondue(s)
+            </div>
+          </td>
+          <td class="actions-cell">
+            <button class="btn-view" (click)="viewDetails(response)">
+              👁️ Voir
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div *ngIf="showDetailModal && selectedResponse" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Détails de la réponse</h2>
+      <button class="btn-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Info générale -->
+      <div class="response-info">
+        <div class="info-item">
+          <span class="info-label">Soumis par :</span>
+          <span class="info-value">{{ selectedResponse.profiles?.email || 'Anonyme' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Date :</span>
+          <span class="info-value">{{ formatDate(selectedResponse.submitted_at) }}</span>
+        </div>
+        <div *ngIf="selectedResponse.forms" class="info-item">
+          <span class="info-label">Formulaire :</span>
+          <span class="info-value">{{ selectedResponse.forms.title }}</span>
+        </div>
+      </div>
+
+      <!-- Réponses -->
+      <div class="responses-detail">
+        <h3>Réponses</h3>
+        <!-- Dans responses.component.html, section modal-body -->
+
+        <!-- Dans la boucle qui affiche les réponses -->
+        <div *ngFor="let key of getResponseKeys(selectedResponse.response_data)">
+          <strong>{{ key }}:</strong>
+          
+          <!-- ✅ Affichage des fichiers -->
+          <div *ngIf="isFileArray(selectedResponse.response_data[key]); else normalValue">
+            <div *ngFor="let file of selectedResponse.response_data[key]" class="file-item">
+              <span>{{ getFileIcon(file.name) }}</span>
+              <a [href]="file.content" target="_blank" class="file-link">
+                {{ getFileNameFromUrl(file.content) }}
+              </a>
+              <button (click)="openFile(file.content)" class="btn-view">
+                Voir
+              </button>
+            </div>
+          </div>
+
+          <!-- Valeur normale -->
+          <ng-template #normalValue>
+            <span>{{ getResponseValue(selectedResponse.response_data, key) }}</span>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModal()">Fermer</button>
+    </div>
+  </div>
+</div>

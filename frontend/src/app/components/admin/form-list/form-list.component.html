@@ -1,0 +1,136 @@
+<div class="form-list-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()">← Retour</button>
+        <h1>📋 Gestion des formulaires</h1>
+      </div>
+      <button class="btn-create" (click)="createNewForm()">
+        ➕ Nouveau formulaire
+      </button>
+    </div>
+  </header>
+
+  <!-- Filtres -->
+  <div class="filters" *ngIf="!loading && forms.length > 0">
+    <button 
+      class="filter-btn"
+      [class.active]="selectedStatus === 'all'"
+      (click)="setFilter('all')">
+      Tous ({{ forms.length }})
+    </button>
+    <button 
+      class="filter-btn"
+      [class.active]="selectedStatus === 'published'"
+      (click)="setFilter('published')">
+      Publiés ({{ getPublishedCount() }})
+    </button>
+    <button 
+      class="filter-btn"
+      [class.active]="selectedStatus === 'draft'"
+      (click)="setFilter('draft')">
+      Brouillons ({{ getDraftCount() }})
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des formulaires...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !loading" class="error-message">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && getFilteredForms().length === 0" class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>Aucun formulaire</h3>
+    <p *ngIf="selectedStatus === 'all'">Créez votre premier formulaire pour commencer</p>
+    <p *ngIf="selectedStatus !== 'all'">Aucun formulaire {{ getStatusText(selectedStatus).toLowerCase() }}</p>
+    <button *ngIf="selectedStatus === 'all'" class="btn-primary" (click)="createNewForm()">
+      ➕ Créer un formulaire
+    </button>
+  </div>
+
+  <!-- Liste des formulaires -->
+  <div *ngIf="!loading && getFilteredForms().length > 0" class="forms-grid">
+    <div *ngFor="let form of getFilteredForms()" class="form-card">
+      <div class="form-card-header">
+        <h3 class="form-title">{{ form.title }}</h3>
+        <span [class]="'badge ' + getStatusBadgeClass(form.status)">
+          {{ getStatusText(form.status) }}
+        </span>
+      </div>
+
+      <p class="form-description">
+        {{ form.description || 'Aucune description' }}
+      </p>
+
+      <div class="form-meta">
+        <span class="meta-item">
+          📅 Créé le {{ formatDate(form.created_at) }}
+        </span>
+        <span class="meta-item" *ngIf="form.updated_at !== form.created_at">
+          🔄 Modifié le {{ formatDate(form.updated_at) }}
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-edit" (click)="editForm(form.id)">
+          ✏️ Modifier
+        </button>
+        <button 
+          *ngIf="form.status === 'draft'" 
+          class="btn-publish" 
+          (click)="publishForm(form.id)">
+          ✅ Publier
+        </button>
+        <button class="btn-responses" (click)="viewResponses(form.id)">
+          📊 Réponses
+        </button>
+        <button class="btn-delete" (click)="confirmDelete(form, $event)">
+          🗑️ Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="cancelDelete()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚠️ Confirmer la suppression</h2>
+      <button class="btn-close" (click)="cancelDelete()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <p>Êtes-vous sûr de vouloir supprimer le formulaire :</p>
+      <p class="form-to-delete-title">
+        <strong>{{ formToDelete?.title }}</strong>
+      </p>
+      <p class="warning-text">
+        ⚠️ Cette action est irréversible. Toutes les réponses associées seront également supprimées.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="btn-cancel" 
+        (click)="cancelDelete()"
+        [disabled]="deleting">
+        Annuler
+      </button>
+      <button 
+        class="btn-confirm-delete" 
+        (click)="deleteForm()"
+        [disabled]="deleting">
+        {{ deleting ? 'Suppression...' : '🗑️ Supprimer' }}
+      </button>
+    </div>
+  </div>
+</div>

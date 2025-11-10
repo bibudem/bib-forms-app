@@ -1,0 +1,18 @@
+<!-- form-fill.component.html -->
+<div class="container" *ngIf="!loading">
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  
+  <div *ngIf="!errorMessage && surveyModel">
+    <survey [model]="surveyModel"></survey>
+    
+    <!-- ✅ Bouton de test manuel -->
+    <button 
+      class="btn-submit-test"
+      (click)="manualSubmit()"
+      style="margin-top: 20px; padding: 12px 24px; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      🧪 Test: Soumettre manuellement
+    </button>
+  </div>
+  
+  <button (click)="goBack()" class="btn-back">Retour</button>
+</div>

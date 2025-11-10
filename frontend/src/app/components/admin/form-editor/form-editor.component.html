@@ -1,0 +1,93 @@
+<div class="form-editor-container">
+  <!-- Header -->
+  <header class="editor-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()">← Retour</button>
+        <h1>{{ isEditMode ? 'Modifier' : 'Créer' }} un formulaire</h1>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-preview" (click)="togglePreview()" [disabled]="saving">
+          {{ showPreview ? '✏️ Éditer' : '👁️ Aperçu' }}
+        </button>
+
+        <button class="btn-save" (click)="saveDraft()" [disabled]="saving">
+          {{ saving ? 'Enregistrement...' : '💾 Enregistrer' }}
+        </button>
+
+        <button class="btn-publish" (click)="saveAndPublish()" [disabled]="saving">
+          ✅ Publier
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Editor Mode -->
+  <div *ngIf="!loading && !showPreview" class="editor-mode">
+    <div class="editor-sidebar">
+      <h3>💡 Types de questions</h3>
+      <p class="sidebar-help">Cliquez pour insérer un template</p>
+
+      <button class="template-btn" (click)="insertTemplate('text')">📝 Texte court</button>
+      <button class="template-btn" (click)="insertTemplate('comment')">📄 Texte long</button>
+      <button class="template-btn" (click)="insertTemplate('dropdown')">📋 Liste déroulante</button>
+      <button class="template-btn" (click)="insertTemplate('checkbox')">☑️ Cases à cocher</button>
+      <button class="template-btn" (click)="insertTemplate('radiogroup')">🔘 Choix unique</button>
+      <button class="template-btn" (click)="insertTemplate('rating')">⭐ Notation</button>
+      <button class="template-btn" (click)="insertTemplate('boolean')">✔️ Oui/Non</button>
+      <button class="template-btn" (click)="insertTemplate('file')">Fichier</button>
+
+      <div class="help-section">
+        <h4>📚 Documentation</h4>
+        https://surveyjs.io/form-library/documentation/api-reference/survey-data-model
+      </div>
+    </div>
+
+    <div class="editor-main">
+      <div class="editor-header-info">
+        <h2>Éditeur JSON</h2>
+        <p>Modifiez le JSON pour créer votre formulaire</p>
+      </div>
+
+      <div *ngIf="jsonError" class="error-message">
+        ⚠️ {{ jsonError }}
+      </div>
+
+      <textarea
+        id="jsonEditor"
+        [(ngModel)]="jsonSchema"
+        (ngModelChange)="validateJSON()"
+        class="json-editor"
+        spellcheck="false"
+        rows="20"
+      ></textarea>
+
+      <div class="editor-info">
+        <p>
+          <strong>💡 Astuce :</strong> Utilisez les boutons à gauche pour insérer des templates de questions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Mode -->
+  <div *ngIf="!loading && showPreview" class="preview-mode">
+  <div class="preview-header">
+    <h2>Aperçu du formulaire</h2>
+    <p>Voici comment les utilisateurs verront votre formulaire</p>
+  </div>
+
+  <div class="preview-container">
+    <survey *ngIf="previewSurvey" [model]="previewSurvey"></survey>
+  </div>
+</div>
+
+</div>
+

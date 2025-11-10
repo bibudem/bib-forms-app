@@ -1,0 +1,40 @@
+<div class="form-selection-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Formulaires disponibles</h1>
+      <div class="user-info">
+        <span class="user-email">{{ userEmail }}</span>
+        <button class="btn-logout" (click)="logout()">
+          Déconnexion
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Chargement des formulaires...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && forms.length === 0" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>Aucun formulaire disponible</h3>
+      <p>Il n'y a actuellement aucun formulaire publié</p>
+    </div>
+
+    <!-- Forms Grid -->
+    <div *ngIf="!loading && forms.length > 0" class="forms-grid">
+      <div *ngFor="let form of forms" class="form-card" (click)="openForm(form.id)">
+        <div class="form-icon">📝</div>
+        <h3>{{ form.title }}</h3>
+        <p class="form-description">{{ form.description || 'Aucune description' }}</p>
+        <button class="btn-fill">Remplir ce formulaire →</button>
+      </div>
+    </div>
+  </main>
+</div>

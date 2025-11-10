@@ -1,8 +1,8 @@
-# 📋 BIB Forms App - Système de Gestion de Formulaires
+# BIB Forms App - Système de Gestion de Formulaires
 
 Application complète de création et gestion de formulaires avec intégration n8n pour l'automatisation des workflows.
 
-## 🏗️ Architecture du Projet
+## Architecture du Projet
 
 ```
 bib-forms-app/
@@ -15,25 +15,25 @@ bib-forms-app/
 
 ## 🎯 Fonctionnalités
 
-### ✨ Frontend (Angular)
-- 🔐 Authentification utilisateur (Supabase Auth)
-- 📝 Création de formulaires avec SurveyJS Creator
-- 📤 Upload de fichiers (images, documents)
-- 📊 Remplissage et soumission de formulaires
-- 👥 Gestion des rôles (Admin / Client)
-- 📈 Tableau de bord administrateur
+### Frontend (Angular)
+- Authentification utilisateur (Supabase Auth)
+- Création de formulaires avec SurveyJS Creator
+- Upload de fichiers (images, documents)
+- Remplissage et soumission de formulaires
+- Gestion des rôles (Admin / Client)
+- Tableau de bord administrateur
 
 ### 🔧 Backend (Node.js + Express)
-- 🔄 API REST pour notifications
-- 🪝 Intégration webhook n8n
-- 📊 Export CSV des réponses
-- 📝 Logging des notifications
-- ⚡ Retry logic pour les webhooks
+- API REST pour notifications
+- Intégration webhook n8n
+- Export CSV des réponses
+- Logging des notifications
+- Retry logic pour les webhooks
 
 ### 🤖 Intégration n8n
-- 📨 Notifications automatiques lors des soumissions
-- 📋 Logging des workflows
-- 🔗 Webhooks configurables (test/production)
+- Notifications automatiques lors des soumissions
+- Logging des workflows
+- Webhooks configurables (test/production)
 
 ---
 

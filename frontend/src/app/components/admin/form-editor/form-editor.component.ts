@@ -4,9 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { SurveyModule } from 'survey-angular-ui';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
+import { surveyLocalization } from 'survey-core';
+import { PlainLight } from 'survey-core/themes';
+
+import 'survey-core/i18n/french';
+
 
 import { Model } from 'survey-core';
-import { DefaultLight } from 'survey-core/themes';
+
+// Définit la langue française par défaut pour SurveyJS
+surveyLocalization.defaultLocale = 'fr';
 
 @Component({
   selector: 'app-form-editor',
@@ -20,13 +27,14 @@ export class FormEditorComponent implements OnInit {
   isEditMode = false;
   loading = true;
   saving = false;
+  
 
   formTitle = 'Mon nouveau formulaire';
   formDescription = '';
   jsonSchema = '';
 
   showPreview = false;
-  previewSurvey!: Model; // ✅ plus de null
+  previewSurvey!: Model; 
   jsonError = '';
 
   defaultTemplate = {
@@ -119,7 +127,7 @@ export class FormEditorComponent implements OnInit {
       try {
         const surveyJSON = JSON.parse(this.jsonSchema);
         this.previewSurvey = new Model(surveyJSON);
-        this.previewSurvey.applyTheme(DefaultLight);
+        this.previewSurvey.applyTheme(PlainLight);
         this.previewSurvey.locale = 'fr';
       } catch (e) {
         alert('Erreur JSON');
@@ -165,6 +173,7 @@ export class FormEditorComponent implements OnInit {
       alert('Erreur : ' + error.message);
     } finally {
       this.saving = false;
+      this.cd.detectChanges();
     }
   }
 

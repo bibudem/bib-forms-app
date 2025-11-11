@@ -1,40 +1,41 @@
-<div class="form-selection-container">
+<div class="container py-4 form-selection-container">
+
   <!-- Header -->
-  <header class="page-header">
-    <div class="header-content">
-      <h1>Formulaires disponibles</h1>
-      <div class="user-info">
-        <span class="user-email">{{ userEmail }}</span>
-        <button class="btn-logout" (click)="logout()">
-          Déconnexion
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-4">Formulaires disponibles</h3>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3 fw-semibold">Chargement des formulaires...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && forms.length === 0" class="text-center my-5">
+    <div class="display-4 mb-3">📋</div>
+    <h3 class="mb-2">Aucun formulaire disponible</h3>
+    <p>Il n'y a actuellement aucun formulaire publié</p>
+  </div>
+
+  <!-- Forms Grid -->
+  <div *ngIf="!loading && forms.length > 0" class="row g-4">
+    <div *ngFor="let form of forms" class="col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex align-items-center mb-2">
+            <div class="me-2 fs-3">📝</div>
+            <h5 class="card-title mb-0">{{ form.title }}</h5>
+          </div>
+          <p class="card-text mb-3">{{ form.description || 'Aucune description' }}</p>
+          <div class="mt-auto">
+            <button class="btn btn-primary w-100" (click)="openForm(form.id)">
+              Remplir ce formulaire →
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Loading -->
-    <div *ngIf="loading" class="loading">
-      <div class="spinner"></div>
-      <p>Chargement des formulaires...</p>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="!loading && forms.length === 0" class="empty-state">
-      <div class="empty-icon">📋</div>
-      <h3>Aucun formulaire disponible</h3>
-      <p>Il n'y a actuellement aucun formulaire publié</p>
-    </div>
-
-    <!-- Forms Grid -->
-    <div *ngIf="!loading && forms.length > 0" class="forms-grid">
-      <div *ngFor="let form of forms" class="form-card" (click)="openForm(form.id)">
-        <div class="form-icon">📝</div>
-        <h3>{{ form.title }}</h3>
-        <p class="form-description">{{ form.description || 'Aucune description' }}</p>
-        <button class="btn-fill">Remplir ce formulaire →</button>
-      </div>
-    </div>
-  </main>
 </div>

@@ -1,0 +1,14 @@
+{
+  "bibforms.footer.bibliotheque": "Les bibliothèques de l’Université de Montréal",
+  "bibforms.footer.emergency": "Urgence 514 343-7771",
+  "bibforms.footer.contact.titre": "Nous joindre",
+  "bibforms.footer.contact.clavarder": "Clavarder avec l'équipe des bibliothèques",
+  "bibforms.footer.infos.titre": "Infos",
+  "bibforms.footer.infos.a_propos": "À propos",
+  "bibforms.footer.liens.confidentialite": "Confidentialité",
+  "bibforms.footer.liens.accord_utilisateur": " Condition d’utilisation",
+  "bibforms.footer.copyright": "© Université de Montréal, {{year}}. Tous droits réservés",
+  "bibforms.footer.contact.site-bib": "Site des bibliothèques",
+  "bibforms.footer.sofia": "Catalogue Sofia",
+  "bibforms.footer.data-base": "Base de données A-Z"
+}

@@ -1,40 +1,38 @@
-<div class="responses-container">
-  <!-- Header -->
-  <header class="page-header">
-    <div class="header-content">
-      <div class="header-left">
-        <button class="btn-back" (click)="goBack()">← Retour</button>
-        <h1>{{ formTitle }}</h1>
-        <span class="response-count">{{ responses.length }} réponse(s)</span>
-      </div>
+<div class="responses-container container py-4">
 
-      <button 
-        class="btn-export" 
-        (click)="exportToCSV()"
-        [disabled]="loading || responses.length === 0"
-      >
-        📥 Exporter CSV
-      </button>
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+      <button class="btn btn-outline-secondary" (click)="goBack()">← Retour</button>
+      <h3 class=" mb-0">{{ formTitle }}</h3>
+      <span class="badge bg-primary">{{ responses.length }} réponse(s)</span>
     </div>
-  </header>
+    <button 
+      class="btn btn-success"
+      (click)="exportToCSV()"
+      [disabled]="loading || responses.length === 0"
+    >
+      📥 Exporter CSV
+    </button>
+  </div>
 
   <!-- Loading -->
-  <div *ngIf="loading" class="loading">
-    <div class="spinner"></div>
-    <p>Chargement des réponses...</p>
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3 fw-semibold">Chargement des réponses...</p>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!loading && responses.length === 0" class="empty-state">
-    <div class="empty-icon">📊</div>
-    <h3>Aucune réponse</h3>
+  <div *ngIf="!loading && responses.length === 0" class="text-center my-5">
+    <div class="display-4 mb-3">📊</div>
+    <h3 class="mb-2">Aucune réponse</h3>
     <p>Aucune réponse n'a encore été soumise pour ce formulaire</p>
   </div>
 
   <!-- Responses Table -->
-  <div *ngIf="!loading && responses.length > 0" class="responses-table-container">
-    <table class="responses-table">
-      <thead>
+  <div *ngIf="!loading && responses.length > 0" class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-light">
         <tr>
           <th>Date</th>
           <th>Utilisateur</th>
@@ -45,22 +43,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let response of responses">
-          <td class="date-cell">
-            {{ formatDate(response.submitted_at) }}
+          <td>{{ formatDate(response.submitted_at) }}</td>
+          <td>{{ response.profiles?.email || 'Anonyme' }}</td>
+          <td *ngIf="!formId">{{ response.forms?.title || 'N/A' }}</td>
+          <td>
+            {{ getResponseKeys(response.response_data).length }} question(s) répondue(s)
           </td>
-          <td class="user-cell">
-            {{ response.profiles?.email || 'Anonyme' }}
-          </td>
-          <td *ngIf="!formId" class="form-cell">
-            {{ response.forms?.title || 'N/A' }}
-          </td>
-          <td class="preview-cell">
-            <div class="response-preview">
-              {{ getResponseKeys(response.response_data).length }} question(s) répondue(s)
-            </div>
-          </td>
-          <td class="actions-cell">
-            <button class="btn-view" (click)="viewDetails(response)">
+          <td>
+            <button class="btn btn-sm btn-outline-primary" (click)="viewDetails(response)">
               👁️ Voir
             </button>
           </td>
@@ -68,65 +58,63 @@
       </tbody>
     </table>
   </div>
+
 </div>
 
 <!-- Detail Modal -->
-<div *ngIf="showDetailModal && selectedResponse" class="modal-overlay" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Détails de la réponse</h2>
-      <button class="btn-close" (click)="closeModal()">✕</button>
-    </div>
+<div *ngIf="showDetailModal && selectedResponse" class="modal fade show d-block" tabindex="-1" role="dialog" (click)="closeModal()">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
 
-    <div class="modal-body">
-      <!-- Info générale -->
-      <div class="response-info">
-        <div class="info-item">
-          <span class="info-label">Soumis par :</span>
-          <span class="info-value">{{ selectedResponse.profiles?.email || 'Anonyme' }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Date :</span>
-          <span class="info-value">{{ formatDate(selectedResponse.submitted_at) }}</span>
-        </div>
-        <div *ngIf="selectedResponse.forms" class="info-item">
-          <span class="info-label">Formulaire :</span>
-          <span class="info-value">{{ selectedResponse.forms.title }}</span>
-        </div>
+      <div class="modal-header">
+        <h5 class="modal-title">Détails de la réponse</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
       </div>
 
-      <!-- Réponses -->
-      <div class="responses-detail">
-        <h3>Réponses</h3>
-        <!-- Dans responses.component.html, section modal-body -->
+      <div class="modal-body">
 
-        <!-- Dans la boucle qui affiche les réponses -->
-        <div *ngFor="let key of getResponseKeys(selectedResponse.response_data)">
-          <strong>{{ key }}:</strong>
-          
-          <!-- ✅ Affichage des fichiers -->
-          <div *ngIf="isFileArray(selectedResponse.response_data[key]); else normalValue">
-            <div *ngFor="let file of selectedResponse.response_data[key]" class="file-item">
-              <span>{{ getFileIcon(file.name) }}</span>
-              <a [href]="file.content" target="_blank" class="file-link">
-                {{ getFileNameFromUrl(file.content) }}
-              </a>
-              <button (click)="openFile(file.content)" class="btn-view">
-                Voir
-              </button>
-            </div>
+        <!-- Info générale -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <strong>Soumis par :</strong> {{ selectedResponse.profiles?.email || 'Anonyme' }}
           </div>
-
-          <!-- Valeur normale -->
-          <ng-template #normalValue>
-            <span>{{ getResponseValue(selectedResponse.response_data, key) }}</span>
-          </ng-template>
+          <div class="col-md-4">
+            <strong>Date :</strong> {{ formatDate(selectedResponse.submitted_at) }}
+          </div>
+          <div class="col-md-4" *ngIf="selectedResponse.forms">
+            <strong>Formulaire :</strong> {{ selectedResponse.forms.title }}
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeModal()">Fermer</button>
+        <!-- Réponses -->
+        <div class="responses-detail">
+          <h6>Réponses</h6>
+          <div *ngFor="let key of getResponseKeys(selectedResponse.response_data)" class="mb-2">
+            <strong>{{ key }}:</strong>
+
+            <!-- Affichage des fichiers -->
+            <div *ngIf="isFileArray(selectedResponse.response_data[key]); else normalValue" class="ms-3">
+              <div *ngFor="let file of selectedResponse.response_data[key]" class="d-flex align-items-center gap-2 mb-1">
+                <span>{{ getFileIcon(file.name) }}</span>
+                <a [href]="file.content" target="_blank">{{ getFileNameFromUrl(file.content) }}</a>
+                <button class="btn btn-sm btn-outline-secondary" (click)="openFile(file.content)">Voir</button>
+              </div>
+            </div>
+
+            <!-- Valeur normale -->
+            <ng-template #normalValue>
+              <span class="ms-2">{{ getResponseValue(selectedResponse.response_data, key) }}</span>
+            </ng-template>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Fermer</button>
+      </div>
+
     </div>
   </div>
 </div>

@@ -285,4 +285,18 @@ async hasResponses(formId: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Récupérer la session actuelle
+ */
+async getSession() {
+  try {
+    const result = await this.supabase.auth.getSession();
+    console.log('[getSession] Résultat:', result);
+    return result;
+  } catch (error) {
+    console.error('[getSession] Erreur:', error);
+    throw error;
+  }
+}
 }

@@ -36,7 +36,7 @@ export class DashboardComponent implements OnInit {
   async ngOnInit() {
     this.loading = false;
     try {
-      await Promise.all([this.loadStats(), this.loadUserInfo()]);
+      await Promise.all([this.loadStats()]);
       this.loading = false;
     } catch (err) {
       console.error('Erreur au chargement du dashboard:', err);
@@ -69,16 +69,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  async loadUserInfo() {
-    try {
-      const profileResult = await this.supabaseService.getProfile();
-      this.userEmail = profileResult?.data?.email ?? 'Invité';
-    } catch (err) {
-      console.error('[Dashboard] Exception loadUserInfo:', err);
-      this.userEmail = 'Invité';
-    }
- }
-
 
   goToForms() {
     this.router.navigate(['/admin/forms']);
@@ -92,8 +82,4 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/admin/forms/new']);
   }
 
-  async logout() {
-    await this.supabaseService.signOut();
-    this.router.navigate(['/login']);
-  }
 }

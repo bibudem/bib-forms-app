@@ -5,6 +5,7 @@ import { SupabaseService } from '../../../services/supabase.service';
 import { FileUploadService } from '../../../services/file-upload.service';
 import { Model } from 'survey-core';
 import { SurveyModule } from 'survey-angular-ui';
+import { PlainLight } from 'survey-core/themes';
 
 @Component({
   selector: 'app-form-fill',
@@ -55,6 +56,7 @@ export class FormFillComponent implements OnInit {
       // Création du survey
       this.surveyModel = new Model(data.json_schema);
       this.surveyModel.locale = 'fr';
+      this.surveyModel.applyTheme(PlainLight);
 
       // ✅ Configuration des boutons
       this.surveyModel.showCompleteButton = true;

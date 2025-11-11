@@ -195,8 +195,6 @@ export class FormListComponent implements OnInit {
       }
 
       console.log('✅ Formulaire supprimé');
-      alert(`✅ Le formulaire "${formTitle}" a été supprimé avec succès.`);
-
       // Recharger la liste
       await this.loadForms();
       this.cancelDelete();
@@ -205,7 +203,9 @@ export class FormListComponent implements OnInit {
       console.error('❌ Exception suppression:', err);
       alert(`Erreur lors de la suppression : ${err.message}`);
     } finally {
+      this.showDeleteModal = false;
       this.deleting = false;
+      this.cd.detectChanges();
     }
   }
 

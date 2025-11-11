@@ -27,8 +27,14 @@
               }
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/survey-core/survey-core.min.css"
+              "node_modules/survey-core/survey-core.min.css",
+              "public/css/custom-bootstrap.css", 
+              "public/css/style.css"  
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           },
           "configurations": {

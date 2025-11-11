@@ -1,0 +1,12 @@
+.header-logo {
+    width: 300px;
+    padding-right: 3rem;
+}
+
+.dropdown-menu {
+  z-index: 1500;
+}
+
+.bg-dark-bib{
+  background-color: #0b113a;
+}

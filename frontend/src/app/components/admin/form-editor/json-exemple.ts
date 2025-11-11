@@ -1,7 +1,11 @@
 export const json = {
   "title": "Formulaire de suggestion d'achat",
   "description": "Veuillez remplir ce formulaire pour suggérer l'achat d'un document",
-  "logoPosition": "right",
+  "logo": "https://suivi-papyrus.bib.umontreal.ca/assets/images/biblio-logo.png",
+  "logoPosition": "left",
+  "logoWidth": "250px",
+  "logoHeight": "auto",
+  "logoFit": "contain",
   "pages": [
     {
       "name": "identification",
@@ -12,7 +16,6 @@ export const json = {
           "name": "nom_diffuseur",
           "title": "Nom",
           "isRequired": false,
-          "defaultValue": "Jabinschi, Natalia",
           "maxLength": 100
         },
         {
@@ -20,7 +23,6 @@ export const json = {
           "name": "categorie_usager",
           "title": "Catégorie d'usager",
           "isRequired": false,
-          "defaultValue": "Analyste informatique",
           "maxLength": 100
         },
         {
@@ -28,7 +30,6 @@ export const json = {
           "name": "faculte_departement",
           "title": "Faculté/Département",
           "isRequired": false,
-          "defaultValue": "TI - ESU - Bibliothèques",
           "maxLength": 100
         },
         {
@@ -44,7 +45,6 @@ export const json = {
           "title": "Courriel",
           "isRequired": false,
           "inputType": "email",
-          "defaultValue": "natalia.jabinschi@umontreal.ca",
           "validators": [
             {
               "type": "email"

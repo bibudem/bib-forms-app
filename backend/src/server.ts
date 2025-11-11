@@ -26,8 +26,6 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // Webhook pour notifier n8n lors d'une soumission
-// Dans votre backend server.ts
-// ✅ Webhook pour notifier n8n lors d'une soumission
 app.post('/api/responses/notify', async (req: Request, res: Response) => {
   try {
     const { responseId, formId, userEmail } = req.body;

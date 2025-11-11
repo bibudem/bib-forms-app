@@ -1,0 +1,74 @@
+<!-- Top Header -->
+<div class="top-header py-4 bg-light">
+  <div class="container d-flex align-items-center justify-content-between">
+    <!-- Logo et titre à gauche -->
+    <div class="d-flex align-items-center">
+      <img src="/images/biblio-logo.png" class="header-logo me-3" alt="Logo Bibliothèque">
+      <h1 class="mb-0">Système de Gestion de Formulaires</h1>
+    </div>
+    
+    <!-- Informations utilisateur à droite -->
+    <div class="user-info" *ngIf="isAuthenticated && !loading">
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" 
+                data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-circle me-2"></i>
+          <span>{{ getDisplayName() }}</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><span class="dropdown-item-text small text-muted">Connecté en tant que</span></li>
+          <li><span class="dropdown-item-text fw-bold">{{ userEmail }}</span></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button class="dropdown-item text-danger" (click)="logout()">
+            <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+          </button></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- État de chargement -->
+    <div *ngIf="loading" class="user-info">
+      <div class="spinner-border spinner-border-sm text-secondary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark bg-gradient">
+  <div class="container">
+    <ul class="navbar-nav me-auto">
+      <li class="nav-item">
+        <a href="/admin" class="nav-link">Accueil</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/forms" class="nav-link">Gestion des formulaires</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/responses" class="nav-link">Réponses</a>
+      </li>
+      <li class="nav-item">
+        <a href="https://surveyjs.io/form-library/documentation/design-survey/create-a-simple-survey" class="nav-link" target="_blank">Documentation</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">FAQ's</a>
+      </li>
+    </ul>
+    
+    <!-- Version mobile de l'info utilisateur -->
+    <div class="navbar-text d-lg-none">
+      <div *ngIf="isAuthenticated && !loading" class="d-flex align-items-center">
+        <span class="text-light me-2 small">{{ getDisplayName() }}</span>
+        <button class="btn btn-sm btn-outline-light" (click)="logout()" title="Déconnexion">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+      <div *ngIf="loading" class="d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm text-light" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

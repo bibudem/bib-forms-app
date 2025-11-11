@@ -1,0 +1,11 @@
+{
+  "bibforms.footer.bibliotheque": "University of Montreal Libraries",
+  "bibforms.footer.emergency": "Emergency 514 343-7771",
+  "bibforms.footer.contact.titre": "Contact Us", 
+  "bibforms.footer.contact.clavarder": "Chat with the library team",
+  "bibforms.footer.infos.titre": "Information",
+  "bibforms.footer.infos.a_propos": "About",
+  "bibforms.footer.liens.confidentialite": "Privacy",
+  "bibforms.footer.liens.accord_utilisateur": "Terms of Use",
+  "bibforms.footer.copyright": "© University of Montreal, {{year}}. All rights reserved"
+}

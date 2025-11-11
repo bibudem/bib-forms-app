@@ -2,28 +2,6 @@
 # .gitignore - BIB Forms App
 # ============================================
 
-# ============================================
-# Variables d'environnement (CRITIQUE)
-# ============================================
-.env
-.env.local
-.env.development
-.env.production
-.env.test
-*.env
-**/.env
-**/env
-
-# ============================================
-# Node.js / NPM
-# ============================================
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
 # Logs
 logs/
 *.log
@@ -51,12 +29,12 @@ jspm_packages/
 # ============================================
 
 # Compiled output
+/frontend/src/config.local.ts
 /frontend/dist/
 /frontend/tmp/
 /frontend/out-tsc/
 /frontend/bazel-out/
 /frontend/.angular/
-
 # Build files
 /frontend/build/
 /frontend/.cache/
@@ -82,6 +60,7 @@ jspm_packages/
 .history/
 
 # Miscellaneous
+/frontend/node_modules/
 /frontend/.sass-cache/
 /frontend/connect.lock
 /frontend/coverage/
@@ -100,10 +79,8 @@ Thumbs.db
 # ============================================
 # TypeScript / Backend
 # ============================================
-/backend/dist/
-/backend/build/
-/backend/tmp/
-*.tsbuildinfo
+/backend/node_modules/
+/backend/.env
 
 # Backend logs
 /backend/logs/
@@ -113,20 +90,6 @@ Thumbs.db
 # Supabase
 # ============================================
 .supabase/
-
-# ============================================
-# Tests
-# ============================================
-coverage/
-*.lcov
-.nyc_output/
-
-# Jest
-/jest-cache/
-
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
 
 # ============================================
 # Fichiers temporaires
@@ -154,11 +117,6 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Linux
-*~
-.directory
-.Trash-*
-
 # ============================================
 # IDE / Éditeurs
 # ============================================
@@ -178,108 +136,6 @@ $RECYCLE.BIN/
 *.sublime-project
 *.sublime-workspace
 
-# Vim
-*.swp
-*.swo
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-rt-v][a-z]
-[._]ss[a-gi-z]
-[._]sw[a-p]
-
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-
-# ============================================
-# Documentation générée
-# ============================================
-/docs/build/
-/documentation/generated/
-
-# ============================================
-# Fichiers de build et production
-# ============================================
-*.map
-*.min.js
-*.min.css
-
-# Production builds
-/prod/
-/production/
-
-# ============================================
-# Uploads et fichiers utilisateur (LOCAL)
-# ============================================
-# Note: Les fichiers sont dans Supabase Storage
-/uploads/
-/user-files/
-/temp-uploads/
-
-# ============================================
-# Base de données locale (si applicable)
-# ============================================
-*.sqlite
-*.sqlite3
-*.db
-
-# ============================================
-# Certificats et clés (CRITIQUE)
-# ============================================
-*.pem
-*.key
-*.cert
-*.crt
-*.p12
-*.pfx
-ssl/
-certs/
-
-# ============================================
-# Archives et fichiers compressés
-# ============================================
-*.zip
-*.tar.gz
-*.rar
-*.7z
-
-# ============================================
-# Fichiers de configuration locaux
-# ============================================
-config.local.json
-secrets.json
-credentials.json
-
-# ============================================
-# CI/CD
-# ============================================
-.github/workflows/secrets/
-.gitlab-ci-local/
-
-# ============================================
-# Divers
-# ============================================
-.vercel
-.next/
-.nuxt/
-
-# Storybook
-storybook-static/
-
-# Serverless
-.serverless/
-
-# FuseBox
-.fusebox/
-
-# DynamoDB Local
-.dynamodb/
-
-# TernJS
-.tern-project
 
 # ============================================
 # Fichiers spécifiques au projet
@@ -288,18 +144,3 @@ storybook-static/
 # N8N workflows exports (si vous exportez localement)
 /n8n-workflows/
 /workflows-backup/
-
-# Exports CSV temporaires
-/exports/*.csv
-/backend/exports/*.csv
-
-# Backups
-*.backup
-*.bak
-backup/
-
-# ============================================
-# Exceptions (fichiers à inclure)
-# ============================================
-!.gitkeep
-!.vscode/extensions.json

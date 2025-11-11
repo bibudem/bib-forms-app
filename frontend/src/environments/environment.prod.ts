@@ -1,10 +1,10 @@
 import { config } from '../config.local';
 
 export const environment = {
-  production: false,
+  production: true,
   supabase: {
     url: config.supabaseUrl,
     anonKey: config.supabaseKey
   },
-  apiUrl: config.apiUrlDev
+  apiUrl: config.apiUrlProd
 };

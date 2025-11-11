@@ -73,7 +73,6 @@ export const config = {
 
 # Bucket pour uploads
 SUPABASE_URL_STORAGE_BUCKET=form-uploads
-```
 
 ### 3. Configuration Supabase
 

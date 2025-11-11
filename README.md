@@ -228,11 +228,7 @@ Ce projet est la propriété de l’Université de Montréal - Bibliothèques.
 ### SurveyJS
 Ce projet utilise la bibliothèque gratuite de SurveyJS (Form Library) sous licence MIT.
 
-**SurveyJS Form Library — MIT License**
-
-Copyright (c) 2015-2025 Devsoft Baltic OÜ
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction … (insertion intégrale de la licence MIT)
+Voir `LICENSES/SURVEYJS_LICENSE.txt` pour les détails complets.
 
 
 **Version** : 1.0.0  

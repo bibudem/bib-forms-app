@@ -1,20 +1,32 @@
-<div class="login-container">
-  <div class="login-card">
-    <h1>Connexion</h1>
-    
+<div class="container d-flex justify-content-center align-items-center">
+  <div class="card p-4">
+    <div class="text-center mb-4">
+      <img src="/images/logo-udem-bib.png" alt="Logo UdeM" class="img-fluid mb-3" style="max-height: 80px;">
+      <h3 class="fw-bold text-dark">Se connecter</h3>
+    </div>
+
+    <!-- ✅ Bouton SSO UdeM -->
+    <div class="d-grid mb-4">
+      <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 py-2">
+        <i class="bi bi-building"></i>
+        <span>Connexion UdeM</span>
+      </button>
+    </div>
+
     <form (ngSubmit)="onLogin()">
       <!-- Message d'erreur -->
-      <div *ngIf="errorMessage" class="error-message">
+      <div *ngIf="errorMessage" class="alert alert-danger py-2 text-center">
         {{ errorMessage }}
       </div>
 
       <!-- Email -->
-      <div class="form-group">
-        <label for="email">Email</label>
+      <div class="mb-3">
+        <label for="email" class="form-label fw-semibold">Courriel</label>
         <input
           type="email"
           id="email"
           name="email"
+          class="form-control"
           [(ngModel)]="email"
           placeholder="votre-email@exemple.com"
           required
@@ -23,12 +35,13 @@
       </div>
 
       <!-- Mot de passe -->
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
+      <div class="mb-3">
+        <label for="password" class="form-label fw-semibold">Mot de passe</label>
         <input
           type="password"
           id="password"
           name="password"
+          class="form-control"
           [(ngModel)]="password"
           placeholder="••••••••"
           required
@@ -37,21 +50,23 @@
       </div>
 
       <!-- Bouton de connexion -->
-      <button 
-        type="submit" 
-        class="btn-primary"
-        [disabled]="loading"
-      >
-        <span *ngIf="!loading">Se connecter</span>
-        <span *ngIf="loading">Connexion en cours...</span>
-      </button>
+      <div class="d-grid mb-3">
+        <button 
+          type="submit" 
+          class="btn btn-primary py-2"
+          [disabled]="loading"
+        >
+          <span *ngIf="!loading"><i class="bi bi-box-arrow-in-right me-2"></i>Se connecter</span>
+          <span *ngIf="loading"><i class="spinner-border spinner-border-sm me-2"></i>Connexion en cours...</span>
+        </button>
+      </div>
 
       <!-- Lien vers inscription -->
-      <div class="register-link">
-        <p>
-          Pas encore de compte ? 
-          <a (click)="goToRegister()" class="link">S'inscrire</a>
-        </p>
+      <div class="text-center">
+        <small class="text-muted">
+          Pas encore de compte ?
+          <a (click)="goToRegister()" class="link-primary text-decoration-none fw-semibold" href="javascript:void(0)">S’inscrire</a>
+        </small>
       </div>
     </form>
   </div>

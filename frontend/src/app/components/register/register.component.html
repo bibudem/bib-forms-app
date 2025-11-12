@@ -1,75 +1,85 @@
-<div class="register-container">
-  <div class="register-card">
-    <h1>Créer un compte</h1>
-    
+<div class="d-flex align-items-center justify-content-center">
+  <div class="card border-0 p-4">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold text-primary">Créer un compte</h1>
+      <p class="text-muted">Complétez les champs ci-dessous pour vous inscrire</p>
+    </div>
+
     <form (ngSubmit)="onRegister()">
-      <!-- Message de succès -->
-      <div *ngIf="successMessage" class="success-message">
+      <!-- ✅ Message de succès -->
+      <div *ngIf="successMessage" class="alert alert-success text-center py-2">
         {{ successMessage }}
       </div>
 
-      <!-- Message d'erreur -->
-      <div *ngIf="errorMessage" class="error-message">
+      <!-- ⚠️ Message d'erreur -->
+      <div *ngIf="errorMessage" class="alert alert-danger text-center py-2">
         {{ errorMessage }}
       </div>
 
       <!-- Email -->
-      <div class="form-group">
-        <label for="email">Email</label>
+      <div class="mb-3">
+        <label for="email" class="form-label">Adresse courriel</label>
         <input
           type="email"
           id="email"
           name="email"
-          [(ngModel)]="email"
+          class="form-control"
           placeholder="votre-email@exemple.com"
+          [(ngModel)]="email"
           required
           [disabled]="loading"
         />
       </div>
 
       <!-- Mot de passe -->
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
+      <div class="mb-3">
+        <label for="password" class="form-label">Mot de passe</label>
         <input
           type="password"
           id="password"
           name="password"
-          [(ngModel)]="password"
+          class="form-control"
           placeholder="Minimum 6 caractères"
+          [(ngModel)]="password"
           required
           [disabled]="loading"
         />
       </div>
 
       <!-- Confirmer mot de passe -->
-      <div class="form-group">
-        <label for="confirmPassword">Confirmer le mot de passe</label>
+      <div class="mb-4">
+        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
         <input
           type="password"
           id="confirmPassword"
           name="confirmPassword"
-          [(ngModel)]="confirmPassword"
+          class="form-control"
           placeholder="Retapez votre mot de passe"
+          [(ngModel)]="confirmPassword"
           required
           [disabled]="loading"
         />
       </div>
 
-      <!-- Bouton d'inscription -->
-      <button 
-        type="submit" 
-        class="btn-primary"
-        [disabled]="loading"
-      >
-        <span *ngIf="!loading">S'inscrire</span>
-        <span *ngIf="loading">Inscription en cours...</span>
-      </button>
+      <!-- Bouton principal -->
+      <div class="d-grid mb-3">
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-lg"
+          [disabled]="loading"
+        >
+          <span *ngIf="!loading">S’inscrire</span>
+          <span *ngIf="loading">Inscription en cours...</span>
+        </button>
+      </div>
 
       <!-- Lien vers connexion -->
-      <div class="login-link">
-        <p>
+      <div class="text-center">
+        <p class="mb-0">
           Déjà un compte ? 
-          <a (click)="goToLogin()" class="link">Se connecter</a>
+          <a href="javascript:void(0)" (click)="goToLogin()" class="text-decoration-none text-primary fw-semibold" >
+            Se connecter
+          </a>
         </p>
       </div>
     </form>

@@ -39,7 +39,7 @@ export class SupabaseService {
   }
 
   async signUp(email: string, password: string) {
-    console.log('[signUp] Tentative d’inscription:', email);
+    //console.log('[signUp] Tentative d’inscription:', email);
     const { data: userData, error: signUpError } = await this.supabase.auth.signUp({ email, password });
     console.log('[signUp] Résultat auth.signUp:', userData, signUpError);
 
@@ -56,7 +56,7 @@ export class SupabaseService {
         .select()
         .single();
 
-      console.log('[signUp] Création du profil:', profileData, profileError);
+      //console.log('[signUp] Création du profil:', profileData, profileError);
       return { data: profileData, error: profileError };
     }
 
@@ -67,7 +67,7 @@ export class SupabaseService {
     console.log('[signIn] Tentative de connexion:', email);
     try {
       const result = await this.supabase.auth.signInWithPassword({ email, password });
-      console.log('[signIn] Résultat:', result);
+      //console.log('[signIn] Résultat:', result);
       return result;
     } catch (err) {
       console.error('[signIn] Exception:', err);
@@ -79,7 +79,7 @@ export class SupabaseService {
     console.log('[signOut] Déconnexion...');
     try {
       const result = await this.supabase.auth.signOut();
-      console.log('[signOut] Résultat:', result);
+      //console.log('[signOut] Résultat:', result);
       this.currentUserSubject.next(null);
       return result;
     } catch (err) {
@@ -117,7 +117,7 @@ export class SupabaseService {
   async isAdmin(): Promise<boolean> {
     const profile = await this.getProfile();
     const isAdmin = profile?.data?.role === 'admin';
-    console.log('[isAdmin] Rôle admin:', isAdmin);
+    //console.log('[isAdmin] Rôle admin:', isAdmin);
     return isAdmin;
   }
 
@@ -292,7 +292,7 @@ async hasResponses(formId: string): Promise<boolean> {
 async getSession() {
   try {
     const result = await this.supabase.auth.getSession();
-    console.log('[getSession] Résultat:', result);
+    //console.log('[getSession] Résultat:', result);
     return result;
   } catch (error) {
     console.error('[getSession] Erreur:', error);

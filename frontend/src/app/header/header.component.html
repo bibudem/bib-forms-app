@@ -1,13 +1,13 @@
 <!-- Top Header -->
 <div class="top-header py-4 bg-light">
-  <div class="container d-flex align-items-center justify-content-between">
-    <!-- Logo et titre à gauche -->
-    <div class="d-flex align-items-center">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap">
+    <!-- Logo et titre -->
+    <div class="d-flex align-items-center mb-2 mb-lg-0">
       <img src="/images/biblio-logo.png" class="header-logo me-3" alt="Logo Bibliothèque">
       <h1 class="mb-0">Système de Gestion de Formulaires</h1>
     </div>
-    
-    <!-- Informations utilisateur à droite -->
+
+    <!-- Utilisateur -->
     <div class="user-info" *ngIf="isAuthenticated && !loading">
       <div class="dropdown">
         <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" 
@@ -25,48 +25,41 @@
         </ul>
       </div>
     </div>
-
-    <!-- État de chargement -->
-    <div *ngIf="loading" class="user-info">
-      <div class="spinner-border spinner-border-sm text-secondary" role="status">
-        <span class="visually-hidden">Chargement...</span>
-      </div>
-    </div>
   </div>
 </div>
 
 <!-- Navbar -->
-<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark bg-gradient">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark bg-gradient sticky-top">
   <div class="container">
-    <ul class="navbar-nav me-auto">
-      <li class="nav-item">
-        <a href="/admin" class="nav-link">Accueil</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/forms" class="nav-link">Gestion des formulaires</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/responses" class="nav-link">Réponses</a>
-      </li>
-      <li class="nav-item">
-        <a href="https://surveyjs.io/form-library/documentation/design-survey/create-a-simple-survey" class="nav-link" target="_blank">Documentation</a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">FAQ's</a>
-      </li>
-    </ul>
-    
-    <!-- Version mobile de l'info utilisateur -->
-    <div class="navbar-text d-lg-none">
-      <div *ngIf="isAuthenticated && !loading" class="d-flex align-items-center">
-        <span class="text-light me-2 small">{{ getDisplayName() }}</span>
-        <button class="btn btn-sm btn-outline-light" (click)="logout()" title="Déconnexion">
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
-      </div>
-      <div *ngIf="loading" class="d-flex align-items-center">
-        <div class="spinner-border spinner-border-sm text-light" role="status">
-          <span class="visually-hidden">Chargement...</span>
+    <!-- Bouton hamburger -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Liens -->
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a href="/admin" class="nav-link">Accueil</a></li>
+        <li class="nav-item"><a href="/admin/forms" class="nav-link">Gestion des formulaires</a></li>
+        <li class="nav-item"><a href="/admin/responses" class="nav-link">Réponses</a></li>
+        <li class="nav-item">
+          <a href="https://surveyjs.io/form-library/documentation/design-survey/create-a-simple-survey"
+             class="nav-link" target="_blank">Documentation</a>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link">FAQ's</a></li>
+      </ul>
+
+      <!-- Version mobile utilisateur -->
+      <div class="d-lg-none mt-3 border-top pt-2">
+        <div *ngIf="isAuthenticated && !loading" class="d-flex align-items-center justify-content-between">
+          <span class="text-light small">{{ getDisplayName() }}</span>
+          <button class="btn btn-sm btn-outline-light" (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+          </button>
+        </div>
+        <div *ngIf="loading" class="text-center">
+          <div class="spinner-border spinner-border-sm text-light" role="status"></div>
         </div>
       </div>
     </div>

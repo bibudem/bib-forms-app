@@ -14,7 +14,7 @@
         <div class="col-md-3" (click)="goToForms()" style="cursor: pointer;">
           <div class="card border-primary h-100 shadow-sm text-center">
             <div class="card-body">
-              <div class="display-5 mb-2">📋</div>
+              <div class="display-5 mb-2"><i class="bi bi-card-checklist"></i></div>
               <h5 class="card-title">Total Formulaires</h5>
               <p class="fs-4 fw-bold text-primary mb-0">{{ stats.totalForms }}</p>
             </div>
@@ -24,7 +24,7 @@
         <div class="col-md-3">
           <div class="card border-success h-100 shadow-sm text-center">
             <div class="card-body">
-              <div class="display-5 mb-2">✅</div>
+              <div class="display-5 mb-2"><i class="bi bi-clipboard-check"></i></div>
               <h5 class="card-title">Publiés</h5>
               <p class="fs-4 fw-bold text-success mb-0">{{ stats.publishedForms }}</p>
             </div>
@@ -34,7 +34,7 @@
         <div class="col-md-3">
           <div class="card border-warning h-100 shadow-sm text-center">
             <div class="card-body">
-              <div class="display-5 mb-2">📝</div>
+              <div class="display-5 mb-2"><i class="bi bi-pencil-square"></i></div>
               <h5 class="card-title">Brouillons</h5>
               <p class="fs-4 fw-bold text-warning mb-0">{{ stats.draftForms }}</p>
             </div>
@@ -44,7 +44,7 @@
         <div class="col-md-3" (click)="goToResponses()" style="cursor: pointer;">
           <div class="card border-info h-100 shadow-sm text-center">
             <div class="card-body">
-              <div class="display-5 mb-2">💬</div>
+              <div class="display-5 mb-2"><i class="bi bi-clipboard-data"></i></div>
               <h5 class="card-title">Réponses reçues</h5>
               <p class="fs-4 fw-bold text-info mb-0">{{ stats.totalResponses }}</p>
             </div>
@@ -59,19 +59,19 @@
 
           <button class="btn btn-outline-primary d-flex align-items-center gap-2"
                   (click)="createNewForm()">
-            <span class="fs-5">➕</span>
+            <span class="fs-5"><i class="bi bi-plus-circle"></i></span>
             <span>Créer un formulaire</span>
           </button>
 
           <button class="btn btn-outline-secondary d-flex align-items-center gap-2"
                   (click)="goToForms()">
-            <span class="fs-5">📄</span>
+            <span class="fs-5"><i class="bi bi-pencil-square"></i></span>
             <span>Gérer les formulaires</span>
           </button>
 
           <button class="btn btn-outline-info d-flex align-items-center gap-2"
                   (click)="goToResponses()">
-            <span class="fs-5">📊</span>
+            <span class="fs-5"><i class="bi bi-clipboard-data"></i> </span>
             <span>Voir les réponses</span>
           </button>
         </div>

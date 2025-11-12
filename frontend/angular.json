@@ -27,6 +27,7 @@
               }
             ],
             "styles": [
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "node_modules/survey-core/survey-core.min.css",
               "public/css/custom-bootstrap.css", 
               "public/css/style.css"  

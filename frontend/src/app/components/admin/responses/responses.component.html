@@ -12,7 +12,7 @@
       (click)="exportToCSV()"
       [disabled]="loading || responses.length === 0"
     >
-      📥 Exporter CSV
+      <i class="bi bi-file-earmark-spreadsheet"></i> Exporter CSV
     </button>
   </div>
 
@@ -24,7 +24,7 @@
 
   <!-- Empty State -->
   <div *ngIf="!loading && responses.length === 0" class="text-center my-5">
-    <div class="display-4 mb-3">📊</div>
+    <div class="display-4 mb-3"><i class="bi bi-clipboard-data"></i></div>
     <h3 class="mb-2">Aucune réponse</h3>
     <p>Aucune réponse n'a encore été soumise pour ce formulaire</p>
   </div>
@@ -51,7 +51,7 @@
           </td>
           <td>
             <button class="btn btn-sm btn-outline-primary" (click)="viewDetails(response)">
-              👁️ Voir
+              <i class="bi bi-eye"></i> Voir
             </button>
           </td>
         </tr>

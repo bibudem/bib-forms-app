@@ -1,0 +1,45 @@
+.top-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.header-logo {
+  height: 48px;
+  width: auto;
+}
+
+.top-header h1 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #0b113a;
+}
+
+/* === Navbar === */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-link {
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #60a5fa;
+}
+
+/* === Responsive === */
+@media (max-width: 992px) {
+  .top-header .container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .header-logo {
+    height: 40px;
+    margin-bottom: 0.5rem;
+  }
+
+  .top-header h1 {
+    font-size: 1.3rem;
+  }
+}

@@ -1,0 +1,26 @@
+/* === Styles améliorés pour les badges de statut === */
+.card .badge {
+  position: relative;
+  right: -1rem; /* rapproche le badge du bord gauche */
+  top: -4px;
+  padding: 6px 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card .badge:hover {
+  transform: scale(1.015);
+}
+
+/* Couleurs des badges selon le statut */
+.badge-published {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+}
+
+.badge-draft {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #fff;
+}

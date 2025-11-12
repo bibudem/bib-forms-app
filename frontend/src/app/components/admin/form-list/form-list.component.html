@@ -7,7 +7,9 @@
         <button class="btn btn-outline-secondary" (click)="goBack()">← Retour</button>
         <h3 class="mb-0">Gestion des formulaires</h3>
       </div>
-      <button class="btn btn-primary" (click)="createNewForm()">➕ Nouveau formulaire</button>
+      <button class="btn btn-primary" (click)="createNewForm()">
+        <i class="bi bi-plus-circle"></i> Nouveau formulaire
+      </button>
     </div>
 
     <!-- Filters -->
@@ -42,45 +44,54 @@
 
     <!-- Empty State -->
     <div *ngIf="!loading && getFilteredForms().length === 0" class="text-center my-5">
-      <div class="display-4 mb-3">📝</div>
+      <div class="display-4 mb-3"><i class="bi bi-pencil"></i></div>
       <h3 class="mb-2">Aucun formulaire</h3>
       <p *ngIf="selectedStatus === 'all'">Créez votre premier formulaire pour commencer</p>
       <p *ngIf="selectedStatus !== 'all'">Aucun formulaire {{ getStatusText(selectedStatus).toLowerCase() }}</p>
       <button *ngIf="selectedStatus === 'all'" class="btn btn-primary mt-3" (click)="createNewForm()">
-        ➕ Créer un formulaire
+        <i class="bi bi-plus-circle"></i> Créer un formulaire
       </button>
     </div>
 
     <!-- Forms Grid -->
     <div *ngIf="!loading && getFilteredForms().length > 0" class="row g-4">
       <div *ngFor="let form of getFilteredForms()" class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm">
+        <div class="card h-100 shadow-sm border-0 rounded-3">
           <div class="card-body d-flex flex-column">
+            
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <h5 class="card-title mb-0">{{ form.title }}</h5>
-              <span class="badge" [ngClass]="getStatusBadgeClass(form.status)">
+              <h5 class="card-title mb-0 text-truncate">{{ form.title }}</h5>
+             <span class="badge"
+                    [ngClass]="{
+                      'badge-published': form.status === 'published',
+                      'badge-draft': form.status === 'draft'
+                    }">
                 {{ getStatusText(form.status) }}
               </span>
+
             </div>
-            <p class="card-text mb-3">{{ form.description || 'Aucune description' }}</p>
+
+            <p class="card-text text-muted mb-3">{{ form.description || 'Aucune description' }}</p>
+
             <div class="text-muted small mb-3">
-              📅 Créé le {{ formatDate(form.created_at) }}<br>
-              <span *ngIf="form.updated_at !== form.created_at">🔄 Modifié le {{ formatDate(form.updated_at) }}</span>
+              <i class="bi bi-calendar-week"></i> Créé le {{ formatDate(form.created_at) }}<br>
+              <span *ngIf="form.updated_at !== form.created_at">
+                <i class="bi bi-repeat"></i> Modifié le {{ formatDate(form.updated_at) }}
+              </span>
             </div>
+
             <div class="mt-auto d-flex flex-wrap gap-2">
               <button class="btn btn-sm btn-outline-secondary" (click)="editForm(form.id)">
-                ✏️ Modifier
-              </button>
-              <button *ngIf="form.status === 'draft'" class="btn btn-sm btn-success" (click)="publishForm(form.id)">
-                ✅ Publier
+                <i class="bi bi-pencil"></i> Modifier
               </button>
               <button class="btn btn-sm btn-info text-white" (click)="viewResponses(form.id)">
-                📊 Réponses
+                <i class="bi bi-clipboard-data"></i> Réponses
               </button>
               <button class="btn btn-sm btn-danger" (click)="confirmDelete(form, $event)">
-                🗑️ Supprimer
+                <i class="bi bi-trash"></i> Supprimer
               </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -91,14 +102,14 @@
       <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">⚠️ Confirmer la suppression</h5>
+            <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmer la suppression</h5>
             <button type="button" class="btn-close" aria-label="Close" (click)="cancelDelete()"></button>
           </div>
           <div class="modal-body">
             <p>Êtes-vous sûr de vouloir supprimer le formulaire :</p>
             <p class="fw-bold">{{ formToDelete?.title }}</p>
             <p class="text-danger small">
-              ⚠️ Cette action est irréversible. Toutes les réponses associées seront également supprimées.
+              <i class="bi bi-exclamation-triangle"></i> Cette action est irréversible. Toutes les réponses associées seront également supprimées.
             </p>
           </div>
           <div class="modal-footer">
@@ -106,7 +117,8 @@
               Annuler
             </button>
             <button type="button" class="btn btn-danger" (click)="deleteForm()" [disabled]="deleting">
-              {{ deleting ? 'Suppression...' : '🗑️ Supprimer' }}
+              <i [class]="deleting ? 'bi bi-hourglass-split' : 'bi bi-trash'"></i>
+              {{ deleting ? 'Suppression...' : 'Supprimer' }}
             </button>
           </div>
         </div>

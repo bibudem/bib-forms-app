@@ -93,4 +93,4 @@ Voir `LICENSES/SURVEYJS_LICENSE.txt` pour les détails complets.
 
 
 **Version** : 1.0.0  
-**Dernière mise à jour** : Novembre 2025
+**Dernière mise à jour** : Janvier 2026

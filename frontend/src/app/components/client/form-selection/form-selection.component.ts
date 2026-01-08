@@ -1,29 +1,25 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { SupabaseService } from '../../../services/supabase.service';
-
-interface Form {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-}
+import { FormsService, Form } from '../../../services/forms.service';
+import { AuthService } from '../../../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-form-selection',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './form-selection.component.html',
-  styleUrl: './form-selection.component.scss'
+  styleUrls: ['./form-selection.component.scss'] // ⚡️ correction styleUrls
 })
 export class FormSelectionComponent implements OnInit {
   forms: Form[] = [];
-  loading: boolean = true;
-  userEmail: string = '';
+  loading = true;
+  userEmail = '';
 
   constructor(
-    private supabaseService: SupabaseService,
+    private formsService: FormsService,
+    private authService: AuthService,
     private router: Router,
     private cd: ChangeDetectorRef
   ) {}
@@ -36,15 +32,11 @@ export class FormSelectionComponent implements OnInit {
   async loadPublishedForms() {
     this.loading = true;
     try {
-      const { data, error } = await this.supabaseService.getForms(true);
-      
-      if (error) {
-        console.error('Erreur:', error);
-      } else if (data) {
-        this.forms = data;
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement:', error);
+      const data: Form[] = await firstValueFrom(this.formsService.getForms(true));
+      this.forms = data;
+      console.log('📋 Formulaires publiés chargés:', this.forms.length);
+    } catch (err: any) {
+      console.error('❌ Erreur lors du chargement des formulaires:', err);
     } finally {
       this.loading = false;
       this.cd.detectChanges();
@@ -52,9 +44,16 @@ export class FormSelectionComponent implements OnInit {
   }
 
   async loadUserInfo() {
-    const profile = await this.supabaseService.getProfile();
-    if (profile && profile.data) {
-      this.userEmail = profile.data.email;
+    try {
+      const profile = await firstValueFrom(this.authService.getProfile());
+      if (profile && profile.data) {
+        this.userEmail = profile.data.email;
+        console.log('👤 Utilisateur connecté:', this.userEmail);
+      }
+    } catch (err) {
+      console.error('❌ Erreur récupération profil:', err);
+    } finally {
+      this.cd.detectChanges();
     }
   }
 
@@ -63,7 +62,11 @@ export class FormSelectionComponent implements OnInit {
   }
 
   async logout() {
-    await this.supabaseService.signOut();
-    this.router.navigate(['/login']);
+    try {
+      await firstValueFrom(this.authService.signOut());
+      // navigation gérée dans AuthService.signOut()
+    } catch (err) {
+      console.error('❌ Erreur lors de la déconnexion:', err);
+    }
   }
 }

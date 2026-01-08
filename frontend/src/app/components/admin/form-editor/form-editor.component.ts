@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SurveyModule } from 'survey-angular-ui';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SupabaseService } from '../../../services/supabase.service';
+import { FormsService } from '../../../services/forms.service';
 import { surveyLocalization } from 'survey-core';
 import { PlainLight } from 'survey-core/themes';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import 'survey-core/i18n/french';
-
 
 import { Model } from 'survey-core';
 
@@ -28,7 +28,6 @@ export class FormEditorComponent implements OnInit {
   loading = true;
   saving = false;
   
-
   formTitle = 'Mon nouveau formulaire';
   formDescription = '';
   jsonSchema = '';
@@ -63,7 +62,7 @@ export class FormEditorComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private supabaseService: SupabaseService,
+    private formsService: FormsService,
     private cd: ChangeDetectorRef
   ) {}
 
@@ -88,12 +87,21 @@ export class FormEditorComponent implements OnInit {
   }
 
   async loadForm(formId: string) {
-    const { data, error } = await this.supabaseService.getForm(formId);
-    if (error || !data) throw new Error('Formulaire non trouvé');
+    try {
+      const form = await this.formsService.getForm(formId).toPromise();
+      
+      if (!form) {
+        throw new Error('Formulaire non trouvé');
+      }
 
-    this.formTitle = data.title;
-    this.formDescription = data.description || '';
-    this.jsonSchema = JSON.stringify(data.json_schema, null, 2);
+      this.formTitle = form.title;
+      this.formDescription = form.description || '';
+      this.jsonSchema = JSON.stringify(form.json_schema, null, 2);
+      
+    } catch (error) {
+      console.error('Erreur loadForm:', error);
+      throw error;
+    }
   }
 
   validateJSON(): boolean {
@@ -147,30 +155,80 @@ export class FormEditorComponent implements OnInit {
     try {
       const surveyJSON = JSON.parse(this.jsonSchema);
 
+      // S'assurer que title et description sont dans surveyJSON
+      if (!surveyJSON.title) {
+        surveyJSON.title = this.formTitle;
+      }
+      if (!surveyJSON.description) {
+        surveyJSON.description = this.formDescription;
+      }
+
       const formData = {
-        title: surveyJSON.title || this.formTitle,
-        description: surveyJSON.description || this.formDescription,
-        json_schema: surveyJSON,
-        status: shouldPublish ? 'published' : 'draft'
+        title: surveyJSON.title,
+        description: surveyJSON.description,
+        json_schema: surveyJSON, // Envoyer l'objet directement
+        status: shouldPublish ? 'published' as const : 'draft' as const
       };
 
+      console.log('📤 Envoi formData:', JSON.stringify(formData, null, 2));
+
       if (this.isEditMode && this.formId) {
-        const { error } = await this.supabaseService.updateForm(this.formId, formData);
-        if (error) throw error;
-        alert(shouldPublish ? 'Formulaire publié !' : 'Formulaire mis à jour !');
-      } else {
-        const { data, error } = await this.supabaseService.createForm(formData);
-        if (error) throw error;
-        if (data) {
-          this.formId = data.id;
-          this.isEditMode = true;
-          alert('Formulaire créé !');
-          this.router.navigate(['/admin/forms', data.id, 'edit']);
+        // Mode édition
+        const updatedForm = await this.formsService.updateForm(this.formId, formData).toPromise();
+        
+        if (!updatedForm) {
+          throw new Error('Erreur lors de la mise à jour');
         }
+        
+        alert(shouldPublish ? 'Formulaire publié !' : 'Formulaire mis à jour !');
+        
+      } else {
+        // Mode création
+        console.log('🆕 Création d\'un nouveau formulaire...');
+        
+        const createdForm = await this.formsService.createForm(formData).toPromise();
+        
+        if (!createdForm) {
+          throw new Error('Erreur lors de la création');
+        }
+        
+        console.log('✅ Formulaire créé:', createdForm);
+        
+        this.formId = createdForm.id;
+        this.isEditMode = true;
+        alert('Formulaire créé avec succès !');
+        this.router.navigate(['/admin/forms', createdForm.id, 'edit']);
       }
+      
     } catch (error: any) {
-      console.error('Erreur:', error);
-      alert('Erreur : ' + error.message);
+      console.error('❌ Erreur saveForm:', error);
+      
+      // Gestion détaillée des erreurs HTTP
+      if (error instanceof HttpErrorResponse) {
+        console.error('Status:', error.status);
+        console.error('Error body:', error.error);
+        console.error('Message:', error.message);
+        
+        let errorMessage = 'Une erreur est survenue';
+        
+        if (error.error?.error) {
+          errorMessage = error.error.error;
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.status === 0) {
+          errorMessage = 'Impossible de contacter le serveur. Vérifiez que le backend est démarré.';
+        } else if (error.status === 401) {
+          errorMessage = 'Non authentifié. Veuillez vous reconnecter.';
+        } else if (error.status === 403) {
+          errorMessage = 'Accès refusé. Droits administrateur requis.';
+        } else if (error.status === 500) {
+          errorMessage = 'Erreur serveur. Consultez les logs du backend.';
+        }
+        
+        alert('Erreur : ' + errorMessage);
+      } else {
+        alert('Erreur : ' + (error.message || 'Une erreur est survenue'));
+      }
     } finally {
       this.saving = false;
       this.cd.detectChanges();
@@ -190,86 +248,86 @@ export class FormEditorComponent implements OnInit {
   goBack() {
     this.router.navigate(['/admin/forms']);
   }
-insertTemplate(type: string) {
-  let template = '';
 
-  switch (type) {
-    case 'text':
-      template = `{
+  insertTemplate(type: string) {
+    let template = '';
+
+    switch (type) {
+      case 'text':
+        template = `{
   "type": "text",
   "name": "question_${Date.now()}",
   "title": "Votre question",
   "isRequired": false
 }`;
-      break;
-    case 'comment':
-      template = `{
+        break;
+      case 'comment':
+        template = `{
   "type": "comment",
   "name": "question_${Date.now()}",
   "title": "Commentaires",
   "rows": 4
 }`;
-      break;
-    case 'dropdown':
-      template = `{
+        break;
+      case 'dropdown':
+        template = `{
   "type": "dropdown",
   "name": "question_${Date.now()}",
   "title": "Sélectionnez une option",
   "choices": ["Option 1", "Option 2", "Option 3"]
 }`;
-      break;
-    case 'checkbox':
-      template = `{
+        break;
+      case 'checkbox':
+        template = `{
   "type": "checkbox",
   "name": "question_${Date.now()}",
   "title": "Cochez les options",
   "choices": ["Option 1", "Option 2", "Option 3"]
 }`;
-      break;
-    case 'radiogroup':
-      template = `{
+        break;
+      case 'radiogroup':
+        template = `{
   "type": "radiogroup",
   "name": "question_${Date.now()}",
   "title": "Choisissez une option",
   "choices": ["Option 1", "Option 2", "Option 3"]
 }`;
-      break;
-    case 'rating':
-      template = `{
+        break;
+      case 'rating':
+        template = `{
   "type": "rating",
   "name": "question_${Date.now()}",
   "title": "Évaluez",
   "rateMin": 1,
   "rateMax": 5
 }`;
-      break;
-    case 'boolean':
-      template = `{
+        break;
+      case 'boolean':
+        template = `{
   "type": "boolean",
   "name": "question_${Date.now()}",
   "title": "Oui ou Non ?",
   "labelTrue": "Oui",
   "labelFalse": "Non"
 }`;
-      break;
-    case 'file':  // ← Nouveau type pour fichier
-      template = `{
+        break;
+      case 'file':
+        template = `{
   "type": "file",
   "name": "question_${Date.now()}",
   "title": "Téléversez un fichier",
   "storeDataAsText": false,
   "maxSize": 1024000
 }`;
-      break;
-  }
+        break;
+    }
 
-  const textarea = document.getElementById('jsonEditor') as HTMLTextAreaElement;
-  if (textarea) {
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = this.jsonSchema;
-    this.jsonSchema = text.substring(0, start) + template + text.substring(end);
+    const textarea = document.getElementById('jsonEditor') as HTMLTextAreaElement;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = this.jsonSchema;
+      this.jsonSchema = text.substring(0, start) + template + text.substring(end);
+    }
   }
-}
-
 }

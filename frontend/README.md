@@ -1,59 +1,78 @@
-# Frontend
+# Bib-Forms App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.5.
+**Application web de gestion de formulaires et de réponses**
+Frontend : Angular | Backend : Node.js/Express | Base de données : PostgreSQL
 
-## Development server
+## Frontend (Angular)
 
-To start a local development server, run:
+### Stack technique
+- **Framework** : Angular
+- **UI** : Bootstrap + Bootstrap Icons
+- **Formulaires** : SurveyJS
+- **Styles** : SCSS
 
+### Ressources incluses
+- **Styles** : `bootstrap-icons`, `survey-core`, styles personnalisés
+- **Scripts** : jQuery, Popper, Bootstrap Bundle
+
+### Lancement
 ```bash
+cd frontend
+npm install
 ng serve
 ```
+- **URL** : [http://localhost:4200](http://localhost:4200)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Backend (Node.js / Express)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Fonctionnalités
+- API REST pour la gestion des formulaires, réponses, authentification et upload de fichiers
+- Base de données **PostgreSQL locale** (plus de Supabase)
 
+### Stack technique
+- **Node.js**, **Express**
+- **PostgreSQL** (via `pg`)
+- **Authentification** : JWT
+- **Upload** : Multer
+- **Sécurité** : Helmet, CORS
+
+### Dépendances principales
+- `express`, `pg`, `jsonwebtoken`, `bcrypt`, `multer`, `dotenv`
+
+### Lancement
 ```bash
-ng generate component component-name
+cd backend
+npm install
+npm run dev
 ```
+- **API** : [http://localhost:3110](http://localhost:3110)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## Base de données
+- **PostgreSQL** (connexion via `.env`)
+- Script d’initialisation :
+  ```bash
+  npm run init-db
+  ```
 
-## Building
+---
 
-To build the project run:
+## Authentification
+- Basée sur **JWT**
+- Gestion des utilisateurs côté backend
+- Sécurité renforcée (Helmet)
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Export des réponses
+- Formats : CSV, Excel
+- Options : export global, par réponse, ou réponse individuelle
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Licence – SurveyJS
+Ce projet utilise des bibliothèques SurveyJS pour la création et l’affichage des formulaires.
+https://surveyjs.io/Licenses

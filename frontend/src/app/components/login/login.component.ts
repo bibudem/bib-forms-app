@@ -2,14 +2,15 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SupabaseService } from '../../services/supabase.service';
+import { AuthService } from '../../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss'] // ⚡ correction styleUrls
 })
 export class LoginComponent {
   email: string = '';
@@ -18,7 +19,7 @@ export class LoginComponent {
   errorMessage: string = '';
 
   constructor(
-    private supabaseService: SupabaseService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -32,24 +33,26 @@ export class LoginComponent {
     this.errorMessage = '';
 
     try {
-      const { data, error } = await this.supabaseService.signIn(this.email, this.password);
+      // Utiliser AuthService pour la connexion
+      const response = await firstValueFrom(this.authService.signIn(this.email, this.password));
 
-      if (error) {
+      if (!response || !response.user) {
         this.errorMessage = 'Email ou mot de passe incorrect';
         this.loading = false;
         return;
       }
 
-      // Vérifier si admin ou client
-      const isAdmin = await this.supabaseService.isAdmin();
-      
-      if (isAdmin) {
+      // Vérifier le rôle
+      if (response.user.role === 'admin') {
         this.router.navigate(['/admin']);
       } else {
         this.router.navigate(['/client']);
       }
+
     } catch (err: any) {
-      this.errorMessage = 'Une erreur est survenue';
+      console.error('❌ Erreur connexion:', err);
+      this.errorMessage = err?.error?.message || 'Une erreur est survenue';
+    } finally {
       this.loading = false;
     }
   }

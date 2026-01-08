@@ -4,16 +4,22 @@
   <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
     <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
       <button class="btn btn-outline-secondary" (click)="goBack()">← Retour</button>
-      <h3 class=" mb-0">{{ formTitle }}</h3>
+      <h3 class="mb-0">{{ formTitle }}</h3>
       <span class="badge bg-primary">{{ responses.length }} réponse(s)</span>
     </div>
-    <button 
-      class="btn btn-success"
-      (click)="exportToCSV()"
-      [disabled]="loading || responses.length === 0"
-    >
-      <i class="bi bi-file-earmark-spreadsheet"></i> Exporter CSV
-    </button>
+    
+    <!-- Boutons d'export groupés -->
+    <div class="btn-group" role="group">
+      <button 
+        type="button" 
+        class="btn btn-success" 
+        aria-expanded="false"
+        (click)="exportToCSV()"
+        [disabled]="loading || responses.length === 0"
+      >
+        <i class="bi bi-download"></i> Exporter tout
+      </button>
+    </div>
   </div>
 
   <!-- Loading -->
@@ -38,21 +44,34 @@
           <th>Utilisateur</th>
           <th *ngIf="!formId">Formulaire</th>
           <th>Réponses</th>
-          <th>Actions</th>
+          <th style="width: 200px;">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let response of responses">
           <td>{{ formatDate(response.submitted_at) }}</td>
-          <td>{{ response.profiles?.email || 'Anonyme' }}</td>
-          <td *ngIf="!formId">{{ response.forms?.title || 'N/A' }}</td>
+          <td>{{ response.profile?.email || 'Anonyme' }}</td>
+          <td *ngIf="!formId">{{ response.form?.title || 'N/A' }}</td>
           <td>
             {{ getResponseKeys(response.response_data).length }} question(s) répondue(s)
           </td>
           <td>
-            <button class="btn btn-sm btn-outline-primary" (click)="viewDetails(response)">
-              <i class="bi bi-eye"></i> Voir
-            </button>
+            <div class="btn-group btn-group-sm" role="group">
+              <button 
+                class="btn btn-outline-primary" 
+                (click)="viewDetails(response)"
+                title="Voir les détails"
+              >
+                <i class="bi bi-eye"></i> Voir
+              </button>
+              <button 
+                class="btn btn-outline-success ml-2" 
+                (click)="exportSingleResponseToCSV(response)"
+                title="Exporter cette réponse en Excel"
+              >
+                <i class="bi bi-file-earmark-excel"></i> CSV
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -76,13 +95,13 @@
         <!-- Info générale -->
         <div class="row mb-3">
           <div class="col-md-4">
-            <strong>Soumis par :</strong> {{ selectedResponse.profiles?.email || 'Anonyme' }}
+            <strong>Soumis par :</strong> {{ selectedResponse.profile?.email || 'Anonyme' }}
           </div>
           <div class="col-md-4">
             <strong>Date :</strong> {{ formatDate(selectedResponse.submitted_at) }}
           </div>
-          <div class="col-md-4" *ngIf="selectedResponse.forms">
-            <strong>Formulaire :</strong> {{ selectedResponse.forms.title }}
+          <div class="col-md-4" *ngIf="selectedResponse.form">
+            <strong>Formulaire :</strong> {{ selectedResponse.form.title }}
           </div>
         </div>
 

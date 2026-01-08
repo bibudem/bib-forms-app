@@ -1,16 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { SupabaseService } from '../../../services/supabase.service';
-
-interface Form {
-  id: string;
-  title: string;
-  description: string;
-  status: 'draft' | 'published';
-  created_at: string;
-  updated_at: string;
-}
+import { FormsService, Form } from '../../../services/forms.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-form-list',
@@ -30,7 +22,7 @@ export class FormListComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private supabaseService: SupabaseService,
+    private formsService: FormsService,
     private cd: ChangeDetectorRef
   ) {}
 
@@ -43,18 +35,12 @@ export class FormListComponent implements OnInit {
     this.errorMessage = '';
 
     try {
-      const { data, error } = await this.supabaseService.getForms(false);
-
-      if (error) {
-        console.error('Erreur:', error);
-        this.errorMessage = 'Erreur lors du chargement des formulaires';
-      } else if (data) {
-        this.forms = data as Form[];
-        console.log('📋 Formulaires chargés:', this.forms.length);
-      }
+      const data = await firstValueFrom(this.formsService.getForms(false));
+      this.forms = data;
+      console.log('📋 Formulaires chargés:', this.forms.length);
     } catch (err: any) {
-      console.error('Exception:', err);
-      this.errorMessage = err.message || 'Erreur inconnue';
+      console.error('❌ Erreur chargement:', err);
+      this.errorMessage = err.message || 'Erreur lors du chargement des formulaires';
     } finally {
       this.loading = false;
       this.cd.detectChanges();
@@ -125,19 +111,12 @@ export class FormListComponent implements OnInit {
     if (!confirm('Publier ce formulaire ?')) return;
 
     try {
-      const { error } = await this.supabaseService.publishForm(formId);
-
-      if (error) {
-        console.error('❌ Erreur publication:', error);
-        alert('Erreur lors de la publication');
-        return;
-      }
-
+      await firstValueFrom(this.formsService.publishForm(formId));
       alert('✅ Formulaire publié avec succès !');
       await this.loadForms();
     } catch (err: any) {
-      console.error('❌ Exception:', err);
-      alert('Erreur: ' + err.message);
+      console.error('❌ Erreur publication:', err);
+      alert('Erreur lors de la publication: ' + err.message);
     }
   }
 
@@ -172,7 +151,9 @@ export class FormListComponent implements OnInit {
       console.log('🗑️ Suppression du formulaire:', formId);
 
       // Vérifier s'il y a des réponses
-      const hasResponses = await this.supabaseService.hasResponses(formId);
+      const hasResponses = await firstValueFrom(
+        this.formsService.hasResponses(formId)
+      );
 
       if (hasResponses) {
         const confirmWithResponses = confirm(
@@ -187,14 +168,11 @@ export class FormListComponent implements OnInit {
       }
 
       // Supprimer le formulaire
-      const { error } = await this.supabaseService.deleteForm(formId);
-
-      if (error) {
-        console.error('❌ Erreur suppression:', error);
-        throw error;
-      }
+      await firstValueFrom(this.formsService.deleteForm(formId));
 
       console.log('✅ Formulaire supprimé');
+      alert(`Formulaire "${formTitle}" supprimé avec succès`);
+      
       // Recharger la liste
       await this.loadForms();
       this.cancelDelete();

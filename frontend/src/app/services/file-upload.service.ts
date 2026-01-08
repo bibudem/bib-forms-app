@@ -1,47 +1,59 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, from } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface FileUploadResult {
   success: boolean;
   filePath?: string;
   fileUrl?: string;
+  file?: UploadedFile;
   error?: string;
+}
+
+export interface UploadedFile {
+  id: string;
+  form_response_id: string;
+  question_name: string;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  file_type: string;
+  uploaded_by: string;
+  uploaded_at: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileUploadService {
-  private supabase: SupabaseClient;
-  private bucketName = 'form-uploads';
+  private apiUrl = environment.apiUrl || 'http://localhost:3000/api';
+  private maxFileSize = 50 * 1024 * 1024; // 50MB
 
-  constructor() {
-    this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.anonKey
-    );
+  constructor(private http: HttpClient) {}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('auth_token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
   /**
-   * ✅ Upload un fichier vers Supabase Storage
+   * ✅ Upload un fichier vers le serveur local
+   * CHANGEMENT: userId et formId sont remplacés par formResponseId
    */
   async uploadFile(
     file: File | { name: string; type: string; content: string },
-    userId: string,
-    formId: string,
+    formResponseId: string,
     questionName: string
   ): Promise<FileUploadResult> {
     try {
-      const maxSize = 50 * 1024 * 1024; // 50MB
+      const formData = new FormData();
+      let fileToUpload: File;
 
-      let fileName: string;
-      let fileData: Blob;
-      let fileType: string;
-
-      // ✅ Gérer les deux types de fichiers
+      // ✅ Gérer les deux types de fichiers (natif et SurveyJS base64)
       if ('content' in file && file.content) {
-        // Fichier encodé en base64 (SurveyJS)
         console.log('📄 Fichier SurveyJS base64:', file.name);
         
         const base64Data = file.content.split(',')[1];
@@ -55,93 +67,76 @@ export class FileUploadService {
           .map((_, i) => byteCharacters.charCodeAt(i));
         const byteArray = new Uint8Array(byteNumbers);
         
-        fileData = new Blob([byteArray], { type: file.type });
-        fileName = this.sanitizeFileName(file.name);
-        fileType = file.type;
-
-        console.log(`📦 Taille du blob: ${fileData.size} bytes`);
+        const blob = new Blob([byteArray], { type: file.type });
+        const sanitizedName = this.sanitizeFileName(file.name);
+        
+        fileToUpload = new File([blob], sanitizedName, { type: file.type });
+        console.log(`📦 Taille du fichier: ${fileToUpload.size} bytes`);
         
       } else if (file instanceof File) {
-        // Fichier natif
         console.log('📄 Fichier natif:', file.name);
         
-        if (file.size > maxSize) {
+        if (file.size > this.maxFileSize) {
           return { 
             success: false, 
             error: 'Fichier trop volumineux. Maximum : 50 MB' 
           };
         }
         
-        fileData = file;
-        fileName = this.sanitizeFileName(file.name);
-        fileType = file.type;
+        fileToUpload = file;
         
       } else {
         throw new Error('Type de fichier non supporté');
       }
 
-      // ✅ Ajouter timestamp pour éviter les collisions
-      const timestamp = Date.now();
-      const finalFileName = `${timestamp}-${fileName}`;
-      const filePath = `${userId}/${formId}/${questionName}/${finalFileName}`;
+      // Préparer le FormData
+      formData.append('file', fileToUpload);
+      formData.append('formResponseId', formResponseId);
+      formData.append('questionName', questionName);
 
-      console.log('📂 Upload vers:', filePath);
-      console.log('📋 Type MIME:', fileType);
+      console.log('📂 Upload vers le serveur...');
 
-      // ✅ Upload vers Supabase
-      const { data: uploadData, error: uploadError } = await this.supabase.storage
-        .from(this.bucketName)
-        .upload(filePath, fileData, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: fileType
-        });
+      // Upload via l'API
+      const result = await this.http.post<any>(
+        `${this.apiUrl}/files/upload`,
+        formData,
+        { headers: this.getAuthHeaders() }
+      ).toPromise();
 
-      if (uploadError) {
-        console.error('❌ Erreur upload Supabase:', uploadError);
-        return { 
-          success: false, 
-          error: `Échec upload: ${uploadError.message}` 
-        };
-      }
+      console.log('✅ Upload réussi:', result);
 
-      console.log('✅ Upload réussi:', uploadData);
-
-      // ✅ Récupérer l'URL publique
-      const { data: urlData } = this.supabase.storage
-        .from(this.bucketName)
-        .getPublicUrl(filePath);
-
-      console.log('🔗 URL publique:', urlData.publicUrl);
+      // Construire l'URL du fichier
+      const fileUrl = `${this.apiUrl}/files/download/${result.file.id}`;
 
       return {
         success: true,
-        filePath,
-        fileUrl: urlData.publicUrl
+        filePath: result.file.file_path,
+        fileUrl: fileUrl,
+        file: result.file
       };
 
     } catch (error: any) {
       console.error('❌ Exception upload:', error);
       return { 
         success: false, 
-        error: `Erreur: ${error.message}` 
+        error: `Erreur: ${error.message || error.error?.error}` 
       };
     }
   }
 
   /**
    * Upload plusieurs fichiers
+   * CHANGEMENT: Signature adaptée pour formResponseId
    */
   async uploadMultipleFiles(
     files: File[],
-    userId: string,
-    formId: string,
+    formResponseId: string,
     questionName: string
   ): Promise<FileUploadResult[]> {
     const results: FileUploadResult[] = [];
 
     for (const file of files) {
-      const result = await this.uploadFile(file, userId, formId, questionName);
+      const result = await this.uploadFile(file, formResponseId, questionName);
       results.push(result);
     }
 
@@ -150,19 +145,16 @@ export class FileUploadService {
 
   /**
    * Supprimer un fichier
+   * CHANGEMENT: Utilise l'ID du fichier au lieu du path
    */
-  async deleteFile(filePath: string): Promise<boolean> {
+  async deleteFile(fileId: string): Promise<boolean> {
     try {
-      console.log('🗑️ Suppression:', filePath);
+      console.log('🗑️ Suppression:', fileId);
 
-      const { error } = await this.supabase.storage
-        .from(this.bucketName)
-        .remove([filePath]);
-
-      if (error) {
-        console.error('❌ Erreur suppression:', error);
-        return false;
-      }
+      await this.http.delete(
+        `${this.apiUrl}/files/${fileId}`,
+        { headers: this.getAuthHeaders() }
+      ).toPromise();
 
       console.log('✅ Fichier supprimé');
       return true;
@@ -175,25 +167,60 @@ export class FileUploadService {
 
   /**
    * Obtenir l'URL publique d'un fichier
+   * CHANGEMENT: Utilise l'ID du fichier
    */
-  getPublicUrl(filePath: string): string {
-    const { data } = this.supabase.storage
-      .from(this.bucketName)
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
+  getPublicUrl(fileId: string): string {
+    return `${this.apiUrl}/files/download/${fileId}`;
   }
 
   /**
-   * ✅ Nettoyer le nom de fichier (améliorer la compatibilité)
+   * Lister les fichiers d'une réponse
+   */
+  getResponseFiles(responseId: string): Observable<UploadedFile[]> {
+    return this.http.get<{ files: UploadedFile[] }>(
+      `${this.apiUrl}/files/response/${responseId}`,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      map((response: any) => response.files || [])
+    );
+  }
+
+  /**
+   * Supprimer tous les fichiers d'une réponse
+   */
+  async deleteResponseFiles(responseId: string): Promise<boolean> {
+    try {
+      console.log(`🗑️ Suppression des fichiers de la réponse ${responseId}`);
+
+      const files = await this.getResponseFiles(responseId).toPromise();
+
+      if (!files || files.length === 0) {
+        console.log('ℹ️ Aucun fichier à supprimer');
+        return true;
+      }
+
+      const deletePromises = files.map(file => this.deleteFile(file.id));
+      await Promise.all(deletePromises);
+
+      console.log(`✅ ${files.length} fichier(s) supprimé(s)`);
+      return true;
+
+    } catch (error) {
+      console.error('❌ Exception suppression fichiers:', error);
+      return false;
+    }
+  }
+
+  /**
+   * ✅ Nettoyer le nom de fichier
    */
   private sanitizeFileName(fileName: string): string {
     return fileName
-      .normalize('NFD') // Décomposer les accents
-      .replace(/[\u0300-\u036f]/g, '') // Supprimer les diacritiques
-      .replace(/[^a-zA-Z0-9.-]/g, '_') // Remplacer caractères spéciaux
-      .replace(/_{2,}/g, '_') // Fusionner underscores multiples
-      .replace(/^_+|_+$/g, '') // Supprimer underscores début/fin
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9.-]/g, '_')
+      .replace(/_{2,}/g, '_')
+      .replace(/^_+|_+$/g, '')
       .toLowerCase();
   }
 
@@ -224,68 +251,17 @@ export class FileUploadService {
 
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
-  
-  /**
- * Supprimer tous les fichiers d'un formulaire
- */
-async deleteFormFiles(userId: string, formId: string): Promise<boolean> {
-  try {
-    console.log(`🗑️ Suppression des fichiers du formulaire ${formId}`);
-
-    // Construire le chemin du dossier
-    const folderPath = `${userId}/${formId}`;
-
-    // Lister tous les fichiers du dossier
-    const { data: files, error: listError } = await this.supabase.storage
-      .from(this.bucketName)
-      .list(folderPath);
-
-    if (listError) {
-      console.error('❌ Erreur listage:', listError);
-      return false;
-    }
-
-    if (!files || files.length === 0) {
-      console.log('ℹ️ Aucun fichier à supprimer');
-      return true;
-    }
-
-    // Construire les chemins complets
-    const filePaths = files.map(file => `${folderPath}/${file.name}`);
-
-    // Supprimer tous les fichiers
-    const { error: deleteError } = await this.supabase.storage
-      .from(this.bucketName)
-      .remove(filePaths);
-
-    if (deleteError) {
-      console.error('❌ Erreur suppression:', deleteError);
-      return false;
-    }
-
-    console.log(`✅ ${files.length} fichier(s) supprimé(s)`);
-    return true;
-
-  } catch (error) {
-    console.error('❌ Exception suppression fichiers:', error);
-    return false;
-  }
 }
 
-/**
- * Supprimer tous les fichiers d'une réponse
- */
-async deleteResponseFiles(formResponseId: string): Promise<boolean> {
-  try {
-    console.log(`🗑️ Suppression des fichiers de la réponse ${formResponseId}`);
-
-    // Récupérer les métadonnées des fichiers via le service Supabase
-    // Note: Vous devrez ajouter cette méthode dans supabase.service.ts si elle n'existe pas
-    
-    return true;
-  } catch (error) {
-    console.error('❌ Exception:', error);
-    return false;
-  }
-}
+// Helper pour map
+function map<T, R>(fn: (value: T) => R) {
+  return (source: Observable<T>): Observable<R> => {
+    return new Observable(observer => {
+      return source.subscribe({
+        next: value => observer.next(fn(value)),
+        error: err => observer.error(err),
+        complete: () => observer.complete()
+      });
+    });
+  };
 }

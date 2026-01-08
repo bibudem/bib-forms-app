@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { SupabaseService } from '../services/supabase.service';
+import { AuthService } from '../services/auth.service';  // ✅ CHANGÉ
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 
@@ -20,13 +20,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private supabaseService: SupabaseService,
+    private authService: AuthService,  // ✅ CHANGÉ
     private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     // On s'abonne directement au BehaviorSubject du service
-    this.userSub = this.supabaseService.currentUser.subscribe(async (user) => {
+    this.userSub = this.authService.currentUser.subscribe(async (user) => {
       if (user) {
         this.isAuthenticated = true;
         this.userEmail = user.email ?? 'Invité';
@@ -46,7 +46,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   async logout() {
     try {
-      await this.supabaseService.signOut();
+      await this.authService.signOut().toPromise();  // ✅ CHANGÉ
       this.isAuthenticated = false;
       this.userEmail = 'Invité';
       this.router.navigate(['/login']);

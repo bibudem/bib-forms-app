@@ -7,8 +7,8 @@ import { FormListComponent } from './components/admin/form-list/form-list.compon
 import { ResponsesComponent } from './components/admin/responses/responses.component';
 import { FormSelectionComponent } from './components/client/form-selection/form-selection.component';
 import { FormFillComponent } from './components/client/form-fill/form-fill.component';
-import { authGuard } from './guards/auth-guard';
-import { adminGuard } from './guards/admin-guard';
+import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },

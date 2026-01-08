@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { SupabaseService } from '../../../services/supabase.service';
+import { FormsService } from '../../../services/forms.service';
 
 interface Stats {
   totalForms: number;
@@ -28,16 +28,15 @@ export class DashboardComponent implements OnInit {
   userEmail: string = '';
 
   constructor(
-    private supabaseService: SupabaseService,
+    private formsService: FormsService,
     private router: Router,
     private cd: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
-    this.loading = false;
+    this.loading = true;
     try {
-      await Promise.all([this.loadStats()]);
-      this.loading = false;
+      await this.loadStats();
     } catch (err) {
       console.error('Erreur au chargement du dashboard:', err);
     } finally {
@@ -46,29 +45,39 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-
   async loadStats() {
     try {
-      const { data: forms, error: formsError } = await this.supabaseService.getForms();
-      if (forms) {
-        this.stats.totalForms = forms.length;
-        this.stats.publishedForms = forms.filter(f => f.status === 'published').length;
-        this.stats.draftForms = forms.filter(f => f.status === 'draft').length;
-      } else if (formsError) {
-        console.error('[Dashboard] Erreur forms:', formsError);
-      }
+      // Charger les formulaires
+      this.formsService.getForms().subscribe({
+        next: (forms) => {
+          if (forms) {
+            this.stats.totalForms = forms.length;
+            this.stats.publishedForms = forms.filter((f: any) => f.status === 'published').length;
+            this.stats.draftForms = forms.filter((f: any) => f.status === 'draft').length;
+          }
+          this.cd.detectChanges();
+        },
+        error: (error) => {
+          console.error('[Dashboard] Erreur forms:', error);
+        }
+      });
 
-      const { data: responses, error: responsesError } = await this.supabaseService.getResponses();
-      if (responses) {
-        this.stats.totalResponses = responses.length;
-      } else if (responsesError) {
-        console.error('[Dashboard] Erreur responses:', responsesError);
-      }
+      // Charger les réponses
+      this.formsService.getResponses().subscribe({
+        next: (responses) => {
+          if (responses) {
+            this.stats.totalResponses = responses.length;
+          }
+          this.cd.detectChanges();
+        },
+        error: (error) => {
+          console.error('[Dashboard] Erreur responses:', error);
+        }
+      });
     } catch (err) {
       console.error('[Dashboard] Exception loadStats:', err);
     }
   }
-
 
   goToForms() {
     this.router.navigate(['/admin/forms']);
@@ -81,5 +90,4 @@ export class DashboardComponent implements OnInit {
   createNewForm() {
     this.router.navigate(['/admin/forms/new']);
   }
-
 }
